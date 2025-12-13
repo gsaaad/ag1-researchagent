@@ -1,0 +1,60 @@
+import os
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+# For better security, load environment variables from a .env file
+from dotenv import load_dotenv
+
+
+
+load_dotenv()
+# Make sure your OPENAI_API_KEY is set in the .env file
+# Initialize the Language Model (using ChatOpenAI is recommended)
+llm = ChatOpenAI(temperature=0)
+# --- Prompt 1: Extract Information ---
+prompt_extract = ChatPromptTemplate.from_template("Extract the technical specifications from the following text:\n\n{text_input}")
+# --- Prompt 2: Transform to JSON ---
+prompt_transform = ChatPromptTemplate.from_template("Transform the following specifications into a JSON object with 'cpu', 'memory', and 'storage' as keys:\n\n{specifications}")
+# --- Build the Chain using LCEL ---
+# The StrOutputParser() converts the LLM's message output to a simple
+extraction_chain = prompt_extract | llm | StrOutputParser()
+# The full chain passes the output of the extraction chain into the
+'specifications'
+# variable for the transformation prompt.
+full_chain = ({"specifications": extraction_chain}| prompt_transform| llm| StrOutputParser())
+# --- Run the Chain ---
+input_text = "The new laptop model features a 3.5 GHz octa-core processor, 16GB of RAM, and a 1TB NVMe SSD."
+# Execute the chain with the input text dictionary.
+final_result = full_chain.invoke({"text_input": input_text})
+print("\n--- Final JSON Output ---")
+print(final_result)
+
+# explain the code
+
+# Load configuration (API key)
+
+# load_dotenv() reads a local .env file and loads environment variables (notably OPENAI_API_KEY) so credentials aren’t hard-coded in the script.
+# Create the LLM client
+
+# llm = ChatOpenAI(temperature=0) initializes a chat-based OpenAI model via LangChain.
+# temperature=0 makes outputs more deterministic/consistent (useful for “structured” extraction).
+# Define two prompt templates
+
+# prompt_extract: asks the model to extract technical specs from raw text ({text_input}).
+# prompt_transform: asks the model to convert extracted specs into JSON with keys: cpu, memory, storage ({specifications}).
+# Build chains using LCEL (pipe composition)
+
+# extraction_chain = prompt_extract | llm | StrOutputParser()
+# Takes input text → prompts the model → parses the response into a plain string.
+# full_chain = ({"specifications": extraction_chain} | prompt_transform | llm | StrOutputParser())
+# Runs the extraction step first, then feeds that result into the transform prompt under the variable name specifications, then parses the final response.
+# Run the chain on an example input
+
+# final_result = full_chain.invoke({"text_input": input_text}) executes the pipeline.
+# Prints the final JSON-like output produced by the model.
+# What the script is teaching you
+# How to build multi-step LLM workflows: Instead of one prompt, you chain multiple prompts where the output of one step becomes input to the next.
+# LCEL basics (| operator): Demonstrates LangChain Expression Language composition to create readable pipelines.
+# Prompt templating with variables: Shows how ChatPromptTemplate uses placeholders like {text_input} and {specifications}.
+# Output parsing: Introduces StrOutputParser() to convert model message objects into plain strings for easier downstream use.
+# “Extract then structure” pattern: Teaches a common approach for turning unstructured natural language into structured data (JSON).

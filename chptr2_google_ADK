@@ -1,0 +1,133 @@
+# Copyright (c) 2025 Marco Fago
+#
+# This code is licensed under the MIT License.
+# See the LICENSE file in the repository for the full license text.
+from unittest import runner
+from urllib import request, response
+import uuid
+from typing import Dict, Any, Optional
+from google.adk.agents import Agent
+from google.adk.runners import InMemoryRunner
+from google.adk.tools import FunctionTool
+from google.genai import types
+from google.adk.events import Event
+import asyncio
+from dotenv import load_dotenv
+load_dotenv()
+# --- Define Tool Functions ---
+# These functions simulate the actions of the specialist agents.
+def booking_handler(request: str) -> str:
+    """
+    Handles booking requests for flights and hotels.
+    Args:
+    request: The user's request for a booking.
+    Returns:
+    A confirmation message that the booking was handled.
+    """
+    print("-------------------------- Booking Handler Called ----------------------------")
+    return f"Booking action for '{request}' has been simulated."
+def info_handler(request: str) -> str:
+    """
+    Handles general information requests.
+    Args:
+    request: The user's question.
+    Returns:
+    A message indicating the information request was handled.
+    """
+    print("-------------------------- Info Handler Called----------------------------")
+    return f"Information request for '{request}'. Result: Simulated information retrieval."
+def unclear_handler(request: str) -> str:
+    """Handles requests that couldn't be delegated."""
+    return f"Coordinator could not delegate request: '{request}'.Please clarify."
+# --- Create Tools from Functions ---
+booking_tool = FunctionTool(booking_handler)
+info_tool = FunctionTool(info_handler)
+# Define specialized sub-agents equipped with their respective tools
+booking_agent = Agent(
+name="Booker",
+model="gemini-2.0-flash",
+description="A specialized agent that handles all flight and hotel booking requests by calling the booking tool.",
+tools=[booking_tool])
+info_agent = Agent(name="Info",model="gemini-2.0-flash",description="A specialized agent that provides general informationand answers user questions by calling the info tool.",tools=[info_tool])
+# Define the parent agent with explicit delegation instructions
+coordinator = Agent(name="Coordinator",model="gemini-2.0-flash",instruction=("You are the main coordinator. Your only task is to analyze incoming user requests and delegate them to the appropriate specialist agent.Do not try to answer the user directly.\n - For any requests related to booking flights or hotels,delegate to the 'Booker' agent.\n- For all other general information questions, delegate to the 'Info' agent."),description="A coordinator that routes user requests to the correct specialist agent.",sub_agents=[booking_agent, info_agent])
+# The presence of sub_agents enables LLM-driven delegation (Auto-Flow) by default.
+
+# --- Execution Logic ---
+async def run_coordinator(runner: InMemoryRunner, request: str):
+    """Runs the coordinator agent with a given request and delegates."""
+    print(f"\n--- Running Coordinator with request: '{request}' ---")
+    final_result = ""
+    try:
+        user_id = "user_123"
+        session_id = str(uuid.uuid4())
+        await runner.session_service.create_session(app_name=runner.app_name, user_id=user_id,session_id=session_id)
+
+        for event in runner.run(user_id=user_id,session_id=session_id,new_message=types.Content(role='user',parts=[types.Part(text=request)]),):
+            if event.is_final_response() and event.content:
+            # Try to get text directly from event.content
+            # to avoid iterating parts
+                print("Full answer is a text content.", event.content)
+                if hasattr(event.content, 'text') and event.content.text:
+                    final_result = event.content.text
+                elif event.content.parts:
+                # Fallback: Iterate through parts and extract text         # (might trigger warning)
+                    text_parts = [part.text for part in event.content.parts if part.text] 
+                    final_result = "".join(text_parts)
+        # Assuming the loop should break after the final response
+                break
+        print(f"Coordinator Final Response: {final_result}")
+        return final_result
+    except Exception as e:
+        print(f"An error occurred while processing your request: {e}")
+        return f"An error occurred while processing your request: {e}"
+async def main():
+    """Main function to run the ADK example."""
+    print("--- Google ADK Routing Example (ADK Auto-Flow Style) ---")
+    print("Note: This requires Google ADK installed and authenticated.")
+    runner = InMemoryRunner(coordinator)
+# Example Usage
+    result_a = await run_coordinator(runner, "Book me a hotel in Paris.")
+    print(f"Final Output A: {result_a}")
+    result_b = await run_coordinator(runner, "What is the highest mountain in the world?")
+    print(f"Final Output B: {result_b}")
+    result_c = await run_coordinator(runner, "Tell me a random fact.")
+    # Should go to Info
+    print(f"Final Output C: {result_c}")
+    result_d = await run_coordinator(runner, "Find flights to Tokyo next month.") # Should go to Booker
+    print(f"Final Output D: {result_d}")
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
+# explain the code
+
+# Script explained in 5 steps
+# Load configuration + import ADK building blocks
+
+# Loads environment variables via load_dotenv() (so API credentials aren’t hard-coded).
+# Imports Google ADK primitives: Agent, InMemoryRunner, FunctionTool, plus google.genai.types for message content.
+# Define “tool” functions (simulated specialist capabilities)
+
+# booking_handler() simulates booking actions (flights/hotels).
+# info_handler() simulates answering general questions.
+# These are plain Python functions that return strings, standing in for real tools/APIs.
+# Wrap those functions as ADK tools
+
+# FunctionTool(booking_handler) and FunctionTool(info_handler) turn your Python functions into callable tools that agents can invoke.
+# Create specialist agents + a coordinator agent
+
+# booking_agent is equipped with the booking tool.
+# info_agent is equipped with the info tool.
+# coordinator is a parent agent with instructions to delegate to the right specialist via sub_agents=[booking_agent, info_agent] (Auto-Flow delegation).
+# Run the coordinator through an in-memory runner and collect the final response
+
+# InMemoryRunner(coordinator) executes the agent graph locally (in-memory session state).
+# run_coordinator() creates a session, streams events from runner.run(...), waits for event.is_final_response(), and extracts only text parts from event.content.parts to form final_result.
+# main() sends several example requests to show routing behavior and prints results.
+# What the script is teaching the user
+# Agent orchestration (coordinator pattern): Use a “parent” agent to route tasks to specialized sub-agents instead of prompting one model to do everything.
+# Tools as the bridge to actions: Wrap normal Python functions as tools (FunctionTool) so agents can call deterministic code (and later real APIs).
+# Auto-Flow delegation: Adding sub_agents enables the coordinator to decide which specialist to use without writing custom routing logic.
+# Event-driven execution: ADK returns a stream of events; you need to listen for the final response and handle multi-part content (text + function calls).
+# Separation of concerns: Specialists do the work; the coordinator only delegates—this is the foundation for scalable multi-agent systems.
