@@ -7,9 +7,7 @@ LangChain agent with ReAct reasoning and tool integration
 
 from typing import List, Callable
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.agents import AgentExecutor, create_react_agent
-from langchain.prompts import PromptTemplate
-from langchain.memory import ConversationBufferMemory
+from langchain.agents import create_agent
 from dotenv import load_dotenv
 import logging
 
@@ -90,7 +88,7 @@ Thought: {agent_scratchpad}"""
         )
         
         # Create the ReAct agent
-        self.agent = create_react_agent(
+        self.agent = create_agent(
             llm=self.llm,
             tools=self.tools,
             prompt=self.prompt

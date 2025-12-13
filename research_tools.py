@@ -6,7 +6,7 @@ Provides web search, Wikipedia, file operations, and calculator tools
 """
 
 from typing import Optional
-from langchain.tools import Tool
+from langchain.tools import BaseTool
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper, WikipediaAPIWrapper
 import os
 import re
@@ -113,27 +113,27 @@ def create_tools():
     calculator = CalculatorTool()
     
     tools = [
-        Tool(
+        BaseTool(
             name="web_search",
             func=web_search.run,
             description="Useful for searching the internet for current information, news, articles, and general knowledge. Input should be a search query string."
         ),
-        Tool(
+        BaseTool(
             name="wikipedia",
             func=wikipedia.run,
             description="Useful for getting detailed information from Wikipedia about historical facts, concepts, people, places, and events. Input should be a topic name or question."
         ),
-        Tool(
+        BaseTool(
             name="read_file",
             func=file_read.run,
             description="Reads the contents of a text file. Input should be the complete file path as a string."
         ),
-        Tool(
+        BaseTool(
             name="write_file",
             func=file_write.run,
             description="Writes content to a text file. Input format: 'filepath|content' where filepath is the destination and content is what to write."
         ),
-        Tool(
+        BaseTool(
             name="calculator",
             func=calculator.run,
             description="Evaluates mathematical expressions. Supports basic operations (+, -, *, /, parentheses). Input should be a mathematical expression like '2 + 2' or '(10 * 5) / 2'."
