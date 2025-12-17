@@ -1,0 +1,36 @@
+2025-12-17 09:25:58 | INFO     | ================================================================================
+2025-12-17 09:25:58 | INFO     | GOOGLE TRENDS PIPELINE - RUN LOG
+2025-12-17 09:25:58 | INFO     | Run ID: 20251217_092558
+2025-12-17 09:25:58 | INFO     | ================================================================================
+2025-12-17 09:25:58 | INFO     | [EVENT] pipeline_start: {"categories": ["Entertainment", "Games", "Shopping"], "data_source": "selenium_direct", "urls": ["48h active (Entertainment, Games, Shopping)", "48h active (All)", "168h active (All)", "168h recent (
+2025-12-17 09:25:58 | INFO     | [EVENT] session_created: {"app_name": "google_trends_pipeline", "user_id": "trends_analyst", "session_id": "session_trends"}
+2025-12-17 09:25:58 | INFO     | [AGENT START] LiveTrendsFetcher
+2025-12-17 09:25:58 | INFO     |   Description: Fetching live Google Trends data using Selenium (renders JavaScript)
+2025-12-17 09:25:58 | INFO     | [ACTION] LiveTrendsFetcher: Initializing Chrome WebDriver (headless)
+2025-12-17 09:26:04 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Entertainment (48h Active)
+2025-12-17 09:26:04 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=4...
+2025-12-17 09:26:07 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Entertainment (48h Active) to render
+2025-12-17 09:26:14 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from Entertainment (48h Active)
+2025-12-17 09:26:14 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Games (48h Active)
+2025-12-17 09:26:14 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=6...
+2025-12-17 09:26:16 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Games (48h Active) to render
+2025-12-17 09:26:22 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 2 trends from Games (48h Active)
+2025-12-17 09:26:22 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Shopping (48h Active)
+2025-12-17 09:26:22 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=16...
+2025-12-17 09:26:24 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Shopping (48h Active) to render
+2025-12-17 09:26:30 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 2 trends from Shopping (48h Active)
+2025-12-17 09:26:30 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (48h Active)
+2025-12-17 09:26:30 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active...
+2025-12-17 09:26:32 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (48h Active) to render
+2025-12-17 09:26:38 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (48h Active)
+2025-12-17 09:26:38 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (7-Day Active)
+2025-12-17 09:26:38 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=168&status=active...
+2025-12-17 09:26:40 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (7-Day Active) to render
+2025-12-17 09:26:46 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (7-Day Active)
+2025-12-17 09:26:46 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (7-Day Recent)
+2025-12-17 09:26:46 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=168&status=active&sort=recency...
+2025-12-17 09:26:47 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (7-Day Recent) to render
+2025-12-17 09:26:53 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (7-Day Recent)
+2025-12-17 09:27:32 | INFO     | [ACTION] LiveTrendsFetcher: Closed WebDriver
+2025-12-17 09:27:32 | INFO     | [OUTPUT] LiveTrendsFetcher produced 13120 bytes
+2025-12-17 09:27:32 | INFO     | [AGENT COMPLETE] LiveTrendsFetcher ✅

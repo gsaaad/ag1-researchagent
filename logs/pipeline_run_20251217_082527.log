@@ -1,0 +1,70 @@
+2025-12-17 08:25:27 | INFO     | ================================================================================
+2025-12-17 08:25:27 | INFO     | GOOGLE TRENDS PIPELINE - RUN LOG
+2025-12-17 08:25:27 | INFO     | Run ID: 20251217_082527
+2025-12-17 08:25:27 | INFO     | ================================================================================
+2025-12-17 08:25:27 | INFO     | [EVENT] pipeline_start: {"categories": ["Entertainment", "Games", "Shopping"], "data_source": "selenium_direct", "urls": ["48h active (Entertainment, Games, Shopping)", "48h active (All)", "168h active (All)", "168h recent (
+2025-12-17 08:25:27 | INFO     | [EVENT] session_created: {"app_name": "google_trends_pipeline", "user_id": "trends_analyst", "session_id": "session_trends"}
+2025-12-17 08:25:27 | INFO     | [AGENT START] LiveTrendsFetcher
+2025-12-17 08:25:27 | INFO     |   Description: Fetching live Google Trends data using Selenium (renders JavaScript)
+2025-12-17 08:25:27 | INFO     | [ACTION] LiveTrendsFetcher: Initializing Chrome WebDriver (headless)
+2025-12-17 08:25:35 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Entertainment (48h Active)
+2025-12-17 08:25:35 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=4...
+2025-12-17 08:25:39 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Entertainment (48h Active) to render
+2025-12-17 08:25:45 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from Entertainment (48h Active)
+2025-12-17 08:25:45 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Games (48h Active)
+2025-12-17 08:25:45 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=6...
+2025-12-17 08:25:48 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Games (48h Active) to render
+2025-12-17 08:25:53 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 3 trends from Games (48h Active)
+2025-12-17 08:25:53 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Shopping (48h Active)
+2025-12-17 08:25:53 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=16...
+2025-12-17 08:25:55 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Shopping (48h Active) to render
+2025-12-17 08:26:00 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 2 trends from Shopping (48h Active)
+2025-12-17 08:26:00 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (48h Active)
+2025-12-17 08:26:00 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active...
+2025-12-17 08:26:02 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (48h Active) to render
+2025-12-17 08:26:08 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (48h Active)
+2025-12-17 08:26:08 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (7-Day Active)
+2025-12-17 08:26:08 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=168&status=active...
+2025-12-17 08:26:10 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (7-Day Active) to render
+2025-12-17 08:26:16 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (7-Day Active)
+2025-12-17 08:26:16 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (7-Day Recent)
+2025-12-17 08:26:16 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=168&status=active&sort=recency...
+2025-12-17 08:26:18 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (7-Day Recent) to render
+2025-12-17 08:26:24 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (7-Day Recent)
+2025-12-17 08:26:27 | INFO     | [ACTION] LiveTrendsFetcher: Closed WebDriver
+2025-12-17 08:26:27 | INFO     | [OUTPUT] LiveTrendsFetcher produced 14081 bytes
+2025-12-17 08:26:27 | INFO     | [AGENT COMPLETE] LiveTrendsFetcher ✅
+2025-12-17 08:26:37 | INFO     | [EVENT] agent_transition: {"from": "LiveTrendsFetcher", "to": "TrendCategorizer"}
+2025-12-17 08:26:37 | INFO     | [AGENT START] TrendCategorizer
+2025-12-17 08:26:37 | INFO     |   Description: LLM processing step
+2025-12-17 08:26:37 | INFO     | [OUTPUT] TrendCategorizer produced 2936 bytes
+2025-12-17 08:26:37 | INFO     | [AGENT COMPLETE] TrendCategorizer ✅
+2025-12-17 08:27:06 | INFO     | [EVENT] agent_transition: {"from": "TrendCategorizer", "to": "TrendsAnalyzer"}
+2025-12-17 08:27:06 | INFO     | [AGENT START] TrendsAnalyzer
+2025-12-17 08:27:06 | INFO     |   Description: LLM processing step
+2025-12-17 08:27:06 | INFO     | [OUTPUT] TrendsAnalyzer produced 12717 bytes
+2025-12-17 08:27:06 | INFO     | [AGENT COMPLETE] TrendsAnalyzer ✅
+2025-12-17 08:28:08 | INFO     | [EVENT] agent_transition: {"from": "TrendsAnalyzer", "to": "InsightsGenerator"}
+2025-12-17 08:28:08 | INFO     | [AGENT START] InsightsGenerator
+2025-12-17 08:28:08 | INFO     |   Description: LLM processing step
+2025-12-17 08:28:08 | INFO     | [OUTPUT] InsightsGenerator produced 26532 bytes
+2025-12-17 08:28:08 | INFO     | [AGENT COMPLETE] InsightsGenerator ✅
+2025-12-17 08:28:08 | INFO     | [AGENT START] TrendSourcesCollector
+2025-12-17 08:28:08 | INFO     |   Description: Collecting news sources for each trending topic via Google Search
+2025-12-17 08:28:08 | INFO     | [ACTION] TrendSourcesCollector: Will search 15 trends
+2025-12-17 08:28:16 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 1/15: rob reiner
+2025-12-17 08:28:20 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'rob reiner breaking news': name 'random' is not defined
+2025-12-17 08:28:53 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'rob reiner trending news': name 'random' is not defined
+2025-12-17 08:29:28 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'rob reiner news': name 'random' is not defined
+2025-12-17 08:30:11 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'rob reiner latest news': name 'random' is not defined
+2025-12-17 08:30:11 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 2/15: brown university
+2025-12-17 08:30:36 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'brown university breaking news': name 'random' is not defined
+2025-12-17 08:31:09 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'brown university trending news': name 'random' is not defined
+2025-12-17 08:31:38 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'brown university news': name 'random' is not defined
+2025-12-17 08:31:59 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'brown university latest news': name 'random' is not defined
+2025-12-17 08:31:59 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 3/15: sherrone moore
+2025-12-17 08:32:14 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'sherrone moore breaking news': name 'random' is not defined
+2025-12-17 08:32:26 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'sherrone moore trending news': name 'random' is not defined
+2025-12-17 08:32:45 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'sherrone moore news': name 'random' is not defined
+2025-12-17 08:34:11 | INFO     | [ACTION] TrendSourcesCollector: Search error for 'sherrone moore latest news': name 'random' is not defined
+2025-12-17 08:34:11 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 4/15: bondi beach

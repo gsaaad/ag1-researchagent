@@ -1,0 +1,332 @@
+{
+  "run_id": "20251217_092754",
+  "start_time": "2025-12-17T09:27:54.247363",
+  "end_time": "2025-12-17T10:28:36.076356",
+  "agents": [
+    {
+      "name": "LiveTrendsFetcher",
+      "start_time": "2025-12-17T09:27:54.255455",
+      "end_time": "2025-12-17T09:28:33.605072",
+      "status": "success",
+      "input_data": null,
+      "output_data": "{'fetch_time': '2025-12-17T09:27:57.778639', 'data_source': 'selenium_direct', 'geo': 'US', 'categories': {'entertainment_48h': {'name': 'Entertainment (48h Active)', 'emoji': '\ud83c\udfac', 'url': 'https://trends.google.com/trending?geo=US&hours=48&status=active&category=4', 'timeframe': '48h', 'category': 'Entertainment', 'trends_count': 25, 'trends': [{'title': 'anthony geary', 'traffic': '500K+'}, {'title': 'karoline leavitt', 'traffic': '100K+'}, {'title': 'disclosure day', 'traffic': '100K+'}, {'tit... (13120 total chars)",
+      "perceptions": [],
+      "actions": [
+        {
+          "timestamp": "2025-12-17T09:27:54.363070",
+          "action": "Initializing Chrome WebDriver (headless)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:27:57.778639",
+          "action": "Fetching Entertainment (48h Active)",
+          "details": "https://trends.google.com/trending?geo=US&hours=48&status=active&category=4"
+        },
+        {
+          "timestamp": "2025-12-17T09:28:00.754940",
+          "action": "Waiting for Entertainment (48h Active) to render",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:05.217711",
+          "action": "Extracted 25 trends from Entertainment (48h Active)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:05.217711",
+          "action": "Fetching Games (48h Active)",
+          "details": "https://trends.google.com/trending?geo=US&hours=48&status=active&category=6"
+        },
+        {
+          "timestamp": "2025-12-17T09:28:05.827102",
+          "action": "Waiting for Games (48h Active) to render",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:10.201481",
+          "action": "Extracted 2 trends from Games (48h Active)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:10.201481",
+          "action": "Fetching Shopping (48h Active)",
+          "details": "https://trends.google.com/trending?geo=US&hours=48&status=active&category=16"
+        },
+        {
+          "timestamp": "2025-12-17T09:28:10.733895",
+          "action": "Waiting for Shopping (48h Active) to render",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:15.097081",
+          "action": "Extracted 2 trends from Shopping (48h Active)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:15.097081",
+          "action": "Fetching All Categories (48h Active)",
+          "details": "https://trends.google.com/trending?geo=US&hours=48&status=active"
+        },
+        {
+          "timestamp": "2025-12-17T09:28:15.640239",
+          "action": "Waiting for All Categories (48h Active) to render",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:20.256221",
+          "action": "Extracted 25 trends from All Categories (48h Active)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:20.256221",
+          "action": "Fetching All Categories (7-Day Active)",
+          "details": "https://trends.google.com/trending?geo=US&hours=168&status=active"
+        },
+        {
+          "timestamp": "2025-12-17T09:28:20.732933",
+          "action": "Waiting for All Categories (7-Day Active) to render",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:25.301058",
+          "action": "Extracted 25 trends from All Categories (7-Day Active)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:25.301058",
+          "action": "Fetching All Categories (7-Day Recent)",
+          "details": "https://trends.google.com/trending?geo=US&hours=168&status=active&sort=recency"
+        },
+        {
+          "timestamp": "2025-12-17T09:28:25.801159",
+          "action": "Waiting for All Categories (7-Day Recent) to render",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:30.286153",
+          "action": "Extracted 25 trends from All Categories (7-Day Recent)",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:28:33.604052",
+          "action": "Closed WebDriver",
+          "details": ""
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "TrendCategorizer",
+      "start_time": "2025-12-17T09:28:42.923332",
+      "end_time": "2025-12-17T09:28:42.923332",
+      "status": "success",
+      "input_data": null,
+      "output_data": "```json\n{\n  \"date\": \"2025-12-17\",\n  \"data_freshness\": \"48h-168h active trends\",\n  \"top_15_by_traffic\": [\n    {\"title\": \"rob reiner\", \"traffic\": \"10M+\", \"category\": \"All\"},\n    {\"title\": \"brown university\", \"traffic\": \"2M+\", \"category\": \"All\"},\n    {\"title\": \"sherrone moore\", \"traffic\": \"2M+\", \"category\": \"All\"},\n    {\"title\": \"bondi beach\", \"traffic\": \"1M+\", \"category\": \"All\"},\n    {\"title\": \"dolphins vs steelers\", \"traffic\": \"1M+\", \"category\": \"All\"},\n    {\"title\": \"patrick mahomes injury\", \"tr... (3150 total chars)",
+      "perceptions": [],
+      "actions": [],
+      "errors": []
+    },
+    {
+      "name": "TrendsAnalyzer",
+      "start_time": "2025-12-17T09:29:08.516150",
+      "end_time": "2025-12-17T09:29:08.519250",
+      "status": "success",
+      "input_data": null,
+      "output_data": "## \ud83d\udcca EXECUTIVE INTELLIGENCE BRIEFING\n\nThe dominant trends revolve around sports (NFL, college football), celebrity news, and the entertainment industry. High search volumes for figures like Rob Reiner and events like \"Dolphins vs Steelers\" suggest broad public interest in these topics. The entertainment category is driven by news about actors, TV shows, and personalities, signaling interest in media consumption and celebrity culture.\n\n## \ud83d\udd25 TOP 10 TRENDS - DEEP ANALYSIS\n\n### 1. rob reiner - 10M+\n... (12708 total chars)",
+      "perceptions": [],
+      "actions": [],
+      "errors": []
+    },
+    {
+      "name": "InsightsGenerator",
+      "start_time": "2025-12-17T09:30:01.914892",
+      "end_time": "2025-12-17T09:30:01.916404",
+      "status": "success",
+      "input_data": null,
+      "output_data": "Okay, I'm ready to build a strategic monetization playbook based on the provided Google Trends data. Here are detailed execution plans across content, e-commerce, affiliate marketing, and news, focusing on high-potential trends.\n\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nSTRATEGIC MONETIZATION PLAYBOOK - DETAILED EXECUTION PLANS\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n## \ud83d\ude80 SECTION 1: CONTENT EMPIRE BUILDING\n\n### \ud83d\udcdd CON... (26241 total chars)",
+      "perceptions": [],
+      "actions": [],
+      "errors": []
+    },
+    {
+      "name": "TrendSourcesCollector",
+      "start_time": "2025-12-17T09:30:01.927267",
+      "end_time": "2025-12-17T10:28:32.434537",
+      "status": "success",
+      "input_data": null,
+      "output_data": "{'trends_searched': 15, 'total_urls': 2398, 'output_file': 'logs\\\\sources\\\\trend_sources_20251217_093001.txt'}",
+      "perceptions": [],
+      "actions": [
+        {
+          "timestamp": "2025-12-17T09:30:01.934810",
+          "action": "Will search 15 trends",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:30:09.728608",
+          "action": "Searching trend 1/15: rob reiner",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:33:51.795436",
+          "action": "Searching trend 2/15: brown university",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:37:59.659308",
+          "action": "Searching trend 3/15: sherrone moore",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:41:22.863713",
+          "action": "Searching trend 4/15: bondi beach",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:45:46.951524",
+          "action": "Searching trend 5/15: dolphins vs steelers",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:49:37.460213",
+          "action": "Searching trend 6/15: patrick mahomes injury",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:53:33.976280",
+          "action": "Searching trend 7/15: anthony geary",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T09:57:46.829075",
+          "action": "Searching trend 8/15: spurs vs knicks",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:01:57.582763",
+          "action": "Searching trend 9/15: trump reiner",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:06:33.230305",
+          "action": "Searching trend 10/15: peter greene",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:10:13.709653",
+          "action": "Searching trend 11/15: conan o'brien",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:13:46.078220",
+          "action": "Searching trend 12/15: fallout season 2",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:17:10.826646",
+          "action": "Searching trend 13/15: powerball numbers dec 15 2025",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:21:17.474666",
+          "action": "Searching trend 14/15: susie wiles",
+          "details": ""
+        },
+        {
+          "timestamp": "2025-12-17T10:25:08.560238",
+          "action": "Searching trend 15/15: 6 7",
+          "details": ""
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "events": [
+    {
+      "timestamp": "2025-12-17T09:27:54.250725",
+      "type": "pipeline_start",
+      "data": {
+        "categories": [
+          "Entertainment",
+          "Games",
+          "Shopping"
+        ],
+        "data_source": "selenium_direct",
+        "urls": [
+          "48h active (Entertainment, Games, Shopping)",
+          "48h active (All)",
+          "168h active (All)",
+          "168h recent (All)"
+        ]
+      }
+    },
+    {
+      "timestamp": "2025-12-17T09:27:54.255455",
+      "type": "session_created",
+      "data": {
+        "app_name": "google_trends_pipeline",
+        "user_id": "trends_analyst",
+        "session_id": "session_trends"
+      }
+    },
+    {
+      "timestamp": "2025-12-17T09:28:42.921767",
+      "type": "agent_transition",
+      "data": {
+        "from": "LiveTrendsFetcher",
+        "to": "TrendCategorizer"
+      }
+    },
+    {
+      "timestamp": "2025-12-17T09:29:08.516150",
+      "type": "agent_transition",
+      "data": {
+        "from": "TrendCategorizer",
+        "to": "TrendsAnalyzer"
+      }
+    },
+    {
+      "timestamp": "2025-12-17T09:30:01.914377",
+      "type": "agent_transition",
+      "data": {
+        "from": "TrendsAnalyzer",
+        "to": "InsightsGenerator"
+      }
+    },
+    {
+      "timestamp": "2025-12-17T10:28:32.438588",
+      "type": "agent_transition",
+      "data": {
+        "from": "InsightsGenerator",
+        "to": "TrendSourcesCollector"
+      }
+    },
+    {
+      "timestamp": "2025-12-17T10:28:36.075158",
+      "type": "session_data_summary",
+      "data": {
+        "live_trends_data_size": 2,
+        "trends_text_list_size": 0,
+        "total_unique_trends": 0,
+        "sources_fetched": 0,
+        "trends_searched_for_sources": 0,
+        "total_source_urls_collected": 0,
+        "sources_file": ""
+      }
+    },
+    {
+      "timestamp": "2025-12-17T10:28:36.075814",
+      "type": "pipeline_complete",
+      "data": {
+        "status": "success"
+      }
+    }
+  ],
+  "metrics": {
+    "total_agents": 5,
+    "successful_agents": 5,
+    "failed_agents": 0,
+    "total_data_bytes": 84202,
+    "duration_seconds": 3641.828993
+  }
+}

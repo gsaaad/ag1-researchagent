@@ -1,0 +1,79 @@
+2025-12-17 09:27:54 | INFO     | ================================================================================
+2025-12-17 09:27:54 | INFO     | GOOGLE TRENDS PIPELINE - RUN LOG
+2025-12-17 09:27:54 | INFO     | Run ID: 20251217_092754
+2025-12-17 09:27:54 | INFO     | ================================================================================
+2025-12-17 09:27:54 | INFO     | [EVENT] pipeline_start: {"categories": ["Entertainment", "Games", "Shopping"], "data_source": "selenium_direct", "urls": ["48h active (Entertainment, Games, Shopping)", "48h active (All)", "168h active (All)", "168h recent (
+2025-12-17 09:27:54 | INFO     | [EVENT] session_created: {"app_name": "google_trends_pipeline", "user_id": "trends_analyst", "session_id": "session_trends"}
+2025-12-17 09:27:54 | INFO     | [AGENT START] LiveTrendsFetcher
+2025-12-17 09:27:54 | INFO     |   Description: Fetching live Google Trends data using Selenium (renders JavaScript)
+2025-12-17 09:27:54 | INFO     | [ACTION] LiveTrendsFetcher: Initializing Chrome WebDriver (headless)
+2025-12-17 09:27:57 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Entertainment (48h Active)
+2025-12-17 09:27:57 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=4...
+2025-12-17 09:28:00 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Entertainment (48h Active) to render
+2025-12-17 09:28:05 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from Entertainment (48h Active)
+2025-12-17 09:28:05 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Games (48h Active)
+2025-12-17 09:28:05 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=6...
+2025-12-17 09:28:05 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Games (48h Active) to render
+2025-12-17 09:28:10 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 2 trends from Games (48h Active)
+2025-12-17 09:28:10 | INFO     | [ACTION] LiveTrendsFetcher: Fetching Shopping (48h Active)
+2025-12-17 09:28:10 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active&category=16...
+2025-12-17 09:28:10 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for Shopping (48h Active) to render
+2025-12-17 09:28:15 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 2 trends from Shopping (48h Active)
+2025-12-17 09:28:15 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (48h Active)
+2025-12-17 09:28:15 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=48&status=active...
+2025-12-17 09:28:15 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (48h Active) to render
+2025-12-17 09:28:20 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (48h Active)
+2025-12-17 09:28:20 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (7-Day Active)
+2025-12-17 09:28:20 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=168&status=active...
+2025-12-17 09:28:20 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (7-Day Active) to render
+2025-12-17 09:28:25 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (7-Day Active)
+2025-12-17 09:28:25 | INFO     | [ACTION] LiveTrendsFetcher: Fetching All Categories (7-Day Recent)
+2025-12-17 09:28:25 | DEBUG    |   Details: https://trends.google.com/trending?geo=US&hours=168&status=active&sort=recency...
+2025-12-17 09:28:25 | INFO     | [ACTION] LiveTrendsFetcher: Waiting for All Categories (7-Day Recent) to render
+2025-12-17 09:28:30 | INFO     | [ACTION] LiveTrendsFetcher: Extracted 25 trends from All Categories (7-Day Recent)
+2025-12-17 09:28:33 | INFO     | [ACTION] LiveTrendsFetcher: Closed WebDriver
+2025-12-17 09:28:33 | INFO     | [OUTPUT] LiveTrendsFetcher produced 13120 bytes
+2025-12-17 09:28:33 | INFO     | [AGENT COMPLETE] LiveTrendsFetcher ✅
+2025-12-17 09:28:42 | INFO     | [EVENT] agent_transition: {"from": "LiveTrendsFetcher", "to": "TrendCategorizer"}
+2025-12-17 09:28:42 | INFO     | [AGENT START] TrendCategorizer
+2025-12-17 09:28:42 | INFO     |   Description: LLM processing step
+2025-12-17 09:28:42 | INFO     | [OUTPUT] TrendCategorizer produced 3150 bytes
+2025-12-17 09:28:42 | INFO     | [AGENT COMPLETE] TrendCategorizer ✅
+2025-12-17 09:29:08 | INFO     | [EVENT] agent_transition: {"from": "TrendCategorizer", "to": "TrendsAnalyzer"}
+2025-12-17 09:29:08 | INFO     | [AGENT START] TrendsAnalyzer
+2025-12-17 09:29:08 | INFO     |   Description: LLM processing step
+2025-12-17 09:29:08 | INFO     | [OUTPUT] TrendsAnalyzer produced 12708 bytes
+2025-12-17 09:29:08 | INFO     | [AGENT COMPLETE] TrendsAnalyzer ✅
+2025-12-17 09:30:01 | INFO     | [EVENT] agent_transition: {"from": "TrendsAnalyzer", "to": "InsightsGenerator"}
+2025-12-17 09:30:01 | INFO     | [AGENT START] InsightsGenerator
+2025-12-17 09:30:01 | INFO     |   Description: LLM processing step
+2025-12-17 09:30:01 | INFO     | [OUTPUT] InsightsGenerator produced 26241 bytes
+2025-12-17 09:30:01 | INFO     | [AGENT COMPLETE] InsightsGenerator ✅
+2025-12-17 09:30:01 | INFO     | [AGENT START] TrendSourcesCollector
+2025-12-17 09:30:01 | INFO     |   Description: Collecting news sources for each trending topic via Google Search
+2025-12-17 09:30:01 | INFO     | [ACTION] TrendSourcesCollector: Will search 15 trends
+2025-12-17 09:30:09 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 1/15: rob reiner
+2025-12-17 09:33:51 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 2/15: brown university
+2025-12-17 09:37:59 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 3/15: sherrone moore
+2025-12-17 09:41:22 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 4/15: bondi beach
+2025-12-17 09:45:46 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 5/15: dolphins vs steelers
+2025-12-17 09:49:37 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 6/15: patrick mahomes injury
+2025-12-17 09:53:33 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 7/15: anthony geary
+2025-12-17 09:57:46 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 8/15: spurs vs knicks
+2025-12-17 10:01:57 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 9/15: trump reiner
+2025-12-17 10:06:33 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 10/15: peter greene
+2025-12-17 10:10:13 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 11/15: conan o'brien
+2025-12-17 10:13:46 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 12/15: fallout season 2
+2025-12-17 10:17:10 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 13/15: powerball numbers dec 15 2025
+2025-12-17 10:21:17 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 14/15: susie wiles
+2025-12-17 10:25:08 | INFO     | [ACTION] TrendSourcesCollector: Searching trend 15/15: 6 7
+2025-12-17 10:28:32 | INFO     | [OUTPUT] TrendSourcesCollector produced 110 bytes
+2025-12-17 10:28:32 | INFO     | [AGENT COMPLETE] TrendSourcesCollector ✅
+2025-12-17 10:28:32 | INFO     | [EVENT] agent_transition: {"from": "InsightsGenerator", "to": "TrendSourcesCollector"}
+2025-12-17 10:28:36 | INFO     | [EVENT] session_data_summary: {"live_trends_data_size": 2, "trends_text_list_size": 0, "total_unique_trends": 0, "sources_fetched": 0, "trends_searched_for_sources": 0, "total_source_urls_collected": 0, "sources_file": ""}
+2025-12-17 10:28:36 | INFO     | [EVENT] pipeline_complete: {"status": "success"}
+2025-12-17 10:28:36 | INFO     | ================================================================================
+2025-12-17 10:28:36 | INFO     | PIPELINE RUN COMPLETE
+2025-12-17 10:28:36 | INFO     | Duration: 3641.83 seconds
+2025-12-17 10:28:36 | INFO     | Agents: 5/5 successful
+2025-12-17 10:28:36 | INFO     | ================================================================================
