@@ -1044,17 +1044,422 @@ Execution Priority: [1-10]
 
 
 # ============================================================================
+# AGENT 5: Google Search Sources Collector
+# ============================================================================
+
+class TrendSourcesCollector(BaseAgent):
+    """
+    Searches Google for each trending topic and collects source URLs.
+    
+    For each trend keyword, performs multiple search variations:
+    - "KEYWORD breaking news"
+    - "KEYWORD trending news"
+    - "KEYWORD news"
+    - "KEYWORD latest news"
+    
+    Collects up to 10 pages of results per query and saves all URLs to a .txt file.
+    """
+    
+    name: str = "TrendSourcesCollector"
+    description: str = "Searches Google for trend sources and saves URLs to text file."
+    
+    # Configuration
+    RESULTS_PER_PAGE: int = 10
+    MAX_PAGES: int = 4  # 4 pages = up to 40 results per query (rate limit friendly)
+    SEARCH_VARIATIONS: list = [
+        "{keyword} breaking news",
+        "{keyword} trending news", 
+        "{keyword} news",
+        "{keyword} latest news",
+    ]
+
+    def _search_google(self, query: str, num_results: int = 100, driver=None) -> list:
+        """
+        Perform a Google search using Selenium and return URLs.
+        Uses multiple selector strategies to find results.
+        
+        Args:
+            query: Search query string
+            num_results: Maximum number of results to collect
+            driver: Selenium WebDriver instance (required)
+        """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        import urllib.parse
+        import time
+        import random
+        
+        urls = []
+        results_per_page = 10
+        
+        if driver is None:
+            print("      ⚠️ No driver provided!")
+            return urls
+        
+        # Calculate pages to fetch
+        pages_needed = min((num_results + results_per_page - 1) // results_per_page, 10)
+        
+        for page in range(pages_needed):
+            start = page * results_per_page
+            
+            # Build Google search URL
+            params = {
+                'q': query,
+                'start': start,
+                'num': results_per_page,
+                'hl': 'en',
+            }
+            search_url = f"https://www.google.com/search?{urllib.parse.urlencode(params)}"
+            
+            try:
+                driver.get(search_url)
+                time.sleep(random.uniform(3.0, 5.0))  # Let page load - increased for stability
+                
+                # Wait for any content to load
+                try:
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.TAG_NAME, "body"))
+                    )
+                except:
+                    pass
+                
+                # Check for CAPTCHA or unusual traffic page
+                page_source = driver.page_source.lower()
+                if "unusual traffic" in page_source or "captcha" in page_source or "recaptcha" in page_source:
+                    print(f"      ⚠️ Rate limited at page {page+1}")
+                    time.sleep(random.uniform(15, 25))
+                    continue
+                
+                # STRATEGY 1: Find all anchor tags and filter
+                all_links = driver.find_elements(By.TAG_NAME, "a")
+                for link in all_links:
+                    try:
+                        href = link.get_attribute("href")
+                        if not href:
+                            continue
+                        
+                        # Skip Google internal URLs
+                        skip_patterns = [
+                            'google.com', 'google.co', 'gstatic.com', 'googleapis.com',
+                            'accounts.google', 'support.google', 'webcache.googleusercontent',
+                            'translate.google', 'maps.google', 'news.google',
+                            '/search?', '/url?', '/imgres?', 'youtube.com/results',
+                            '#', 'javascript:', 'about:'
+                        ]
+                        
+                        if any(pattern in href.lower() for pattern in skip_patterns):
+                            continue
+                        
+                        # Must be a valid HTTP URL
+                        if href.startswith("http://") or href.startswith("https://"):
+                            # Additional validation - must have a proper domain
+                            if '.' in href.split('/')[2]:  # Check domain has dot
+                                if href not in urls:
+                                    urls.append(href)
+                    except:
+                        continue
+                
+                # STRATEGY 2: Look for cite elements (Google shows URLs in cite tags)
+                cite_elements = driver.find_elements(By.TAG_NAME, "cite")
+                for cite in cite_elements:
+                    try:
+                        # Get parent anchor
+                        parent = cite.find_element(By.XPATH, "./ancestor::a")
+                        href = parent.get_attribute("href")
+                        if href and href.startswith("http") and 'google' not in href.lower():
+                            if href not in urls:
+                                urls.append(href)
+                    except:
+                        continue
+                
+                # STRATEGY 3: Look for h3 elements (result titles) and get parent links
+                h3_elements = driver.find_elements(By.TAG_NAME, "h3")
+                for h3 in h3_elements:
+                    try:
+                        parent = h3.find_element(By.XPATH, "./ancestor::a")
+                        href = parent.get_attribute("href")
+                        if href and href.startswith("http") and 'google' not in href.lower():
+                            if href not in urls:
+                                urls.append(href)
+                    except:
+                        continue
+                
+                # Check if we have enough results
+                if len(urls) >= num_results:
+                    break
+                
+                # Longer delay between pages to avoid rate limiting
+                time.sleep(random.uniform(6.0, 10.0))
+                
+            except Exception as page_error:
+                error_str = str(page_error)[:60]
+                if "timeout" not in error_str.lower():
+                    print(f"      ⚠️ Page {page+1} error: {error_str}")
+                time.sleep(8)
+                continue
+        
+        return urls[:num_results]
+
+    async def _run_async_impl(
+        self, context: InvocationContext
+    ) -> AsyncGenerator[Event, None]:
+        """Search Google for each trend and collect source URLs."""
+        global agent_logger
+        
+        agent_logger.log_agent_start(
+            self.name,
+            "Collecting news sources for each trending topic via Google Search"
+        )
+        
+        try:
+            import time
+            import re
+            import random  # Import at top for all delay operations
+            
+            # Get trends from session state
+            live_trends_data = context.session.state.get("live_trends_data", {})
+            all_trends = live_trends_data.get("all_trends_flat", [])
+            
+            if not all_trends:
+                error_msg = "No trends data found in session state"
+                agent_logger.log_agent_complete(self.name, success=False, error=error_msg)
+                content = types.Content(role="model", parts=[types.Part(text=f"❌ {error_msg}")])
+                yield Event(author=self.name, content=content)
+                return
+            
+            # Select top trends to search (limit to avoid rate limiting)
+            # Sort by traffic and take top 15
+            def traffic_sort_key(t):
+                traffic = t.get("traffic", "0")
+                # Convert traffic string to numeric for sorting
+                multipliers = {"M": 1000000, "K": 1000, "B": 1000000000}
+                match = re.match(r'(\d+)([KMB])?', traffic.replace("+", "").replace(",", ""))
+                if match:
+                    num = int(match.group(1))
+                    suffix = match.group(2)
+                    if suffix:
+                        num *= multipliers.get(suffix, 1)
+                    return num
+                return 0
+            
+            sorted_trends = sorted(all_trends, key=traffic_sort_key, reverse=True)
+            top_trends = sorted_trends[:15]  # Top 15 trends
+            
+            print("\n" + "="*70)
+            print("🔍 GOOGLE SEARCH - COLLECTING NEWS SOURCES")
+            print("="*70)
+            print(f"\n📊 Processing top {len(top_trends)} trends")
+            print(f"📄 Search variations: {len(self.SEARCH_VARIATIONS)} per trend")
+            print(f"📑 Max pages per search: {self.MAX_PAGES} ({self.MAX_PAGES * self.RESULTS_PER_PAGE} results)")
+            
+            # Prepare output file
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_dir = Path("logs/sources")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_file = output_dir / f"trend_sources_{timestamp}.txt"
+            
+            # Collect all sources
+            all_sources = {}
+            total_urls_collected = 0
+            
+            agent_logger.log_agent_action(self.name, f"Will search {len(top_trends)} trends")
+            
+            # Initialize shared Selenium driver for all searches
+            from selenium import webdriver
+            from selenium.webdriver.chrome.service import Service
+            from selenium.webdriver.chrome.options import Options
+            from webdriver_manager.chrome import ChromeDriverManager
+            
+            print("\n🚀 Initializing Selenium browser for Google Search...")
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-gpu")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--window-size=1920,1080")
+            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+            chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            chrome_options.add_experimental_option('useAutomationExtension', False)
+            chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            
+            service = Service(ChromeDriverManager().install())
+            shared_driver = webdriver.Chrome(service=service, options=chrome_options)
+            shared_driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            print("   ✅ Browser ready!")
+            
+            try:
+                with open(output_file, "w", encoding="utf-8") as f:
+                    # Write header
+                    f.write("="*80 + "\n")
+                    f.write("GOOGLE TRENDS - NEWS SOURCES COLLECTION\n")
+                    f.write(f"Generated: {datetime.now().isoformat()}\n")
+                    f.write(f"Total Trends Searched: {len(top_trends)}\n")
+                    f.write("="*80 + "\n\n")
+                    
+                    for idx, trend in enumerate(top_trends, 1):
+                        keyword = trend.get("title", "")
+                        traffic = trend.get("traffic", "N/A")
+                        category = trend.get("category", "Unknown")
+                        
+                        if not keyword:
+                            continue
+                        
+                        print(f"\n{'─'*60}")
+                        print(f"🔎 [{idx}/{len(top_trends)}] Searching: {keyword} ({traffic})")
+                        print(f"{'─'*60}")
+                        
+                        agent_logger.log_agent_action(
+                            self.name, 
+                            f"Searching trend {idx}/{len(top_trends)}: {keyword}"
+                        )
+                        
+                        # Write trend header to file
+                        f.write("\n" + "="*80 + "\n")
+                        f.write(f"TREND: {keyword}\n")
+                        f.write(f"Traffic: {traffic} | Category: {category}\n")
+                        f.write("="*80 + "\n")
+                        
+                        trend_urls = []
+                        
+                        # Search each variation
+                        for variation in self.SEARCH_VARIATIONS:
+                            query = variation.format(keyword=keyword)
+                            
+                            print(f"   🔍 Query: \"{query}\"")
+                            f.write(f"\n--- Query: \"{query}\" ---\n")
+                            
+                            try:
+                                # Perform Google search using shared driver
+                                results = self._search_google(
+                                    query,
+                                    num_results=self.MAX_PAGES * self.RESULTS_PER_PAGE,
+                                    driver=shared_driver
+                                )
+                                
+                                urls_found = len(results)
+                                print(f"      ✅ Found {urls_found} URLs")
+                                
+                                # Write URLs to file
+                                for i, url in enumerate(results, 1):
+                                    f.write(f"{i}. {url}\n")
+                                    if url not in trend_urls:
+                                        trend_urls.append(url)
+                                
+                                total_urls_collected += urls_found
+                                import random
+                                # Longer delay between queries to avoid rate limiting
+                                time.sleep(random.uniform(8.0, 12.0))
+                            
+                            except Exception as e:
+                                error_msg = str(e)
+                                print(f"      ⚠️ Error: {error_msg[:50]}...")
+                                f.write(f"ERROR: {error_msg}\n")
+                                agent_logger.log_agent_action(
+                                    self.name,
+                                    f"Search error for '{query}': {error_msg[:100]}"
+                                )
+                                # If rate limited, wait longer
+                                if "429" in error_msg or "rate" in error_msg.lower():
+                                    print("      ⏳ Rate limited, waiting 30 seconds...")
+                                    time.sleep(30)
+                        
+                        # Store unique URLs for this trend (after all variations searched)
+                        all_sources[keyword] = {
+                            "traffic": traffic,
+                            "category": category,
+                            "urls": trend_urls,
+                            "url_count": len(trend_urls),
+                        }
+                        
+                        # Write summary for this trend
+                        f.write(f"\n📊 Total unique URLs for '{keyword}': {len(trend_urls)}\n")
+                        
+                        print(f"   📊 Total unique URLs: {len(trend_urls)}")
+                        
+                        # Long delay between trends to let browser recover
+                        print(f"   ⏳ Waiting 15-20 seconds before next trend...")
+                        time.sleep(random.uniform(15.0, 20.0))
+                    
+                    # Write final summary to file
+                    f.write("\n\n" + "="*80 + "\n")
+                    f.write("COLLECTION SUMMARY\n")
+                    f.write("="*80 + "\n")
+                    f.write(f"Total Trends Searched: {len(top_trends)}\n")
+                    f.write(f"Total URLs Collected: {total_urls_collected}\n")
+                    f.write(f"Unique URLs per Trend:\n")
+                    for keyword, data in all_sources.items():
+                        f.write(f"  - {keyword}: {data['url_count']} URLs\n")
+                    f.write("\n" + "="*80 + "\n")
+                
+                # Also save as JSON for programmatic access
+                json_file = output_dir / f"trend_sources_{timestamp}.json"
+                with open(json_file, "w", encoding="utf-8") as f:
+                    json.dump({
+                        "generated": datetime.now().isoformat(),
+                        "total_trends": len(top_trends),
+                        "total_urls": total_urls_collected,
+                        "search_variations": self.SEARCH_VARIATIONS,
+                        "sources_by_trend": all_sources,
+                    }, f, indent=2)
+                
+                # Store in session state for next agents
+                context.session.state["trend_sources"] = all_sources
+                context.session.state["sources_file"] = str(output_file)
+                context.session.state["sources_json_file"] = str(json_file)
+                
+                agent_logger.log_agent_output(self.name, {
+                    "trends_searched": len(top_trends),
+                    "total_urls": total_urls_collected,
+                    "output_file": str(output_file),
+                })
+                agent_logger.log_agent_complete(self.name, success=True)
+                
+                print(f"\n{'='*70}")
+                print(f"📊 SEARCH COMPLETE")
+                print(f"   Trends searched: {len(top_trends)}")
+                print(f"   Total URLs collected: {total_urls_collected}")
+                print(f"   📄 Text file: {output_file}")
+                print(f"   📄 JSON file: {json_file}")
+                print(f"{'='*70}")
+                
+                content = types.Content(
+                    role="model",
+                    parts=[types.Part(text=f"✅ Collected {total_urls_collected} source URLs for {len(top_trends)} trends. Saved to {output_file}")]
+                )
+                yield Event(author=self.name, content=content)
+                
+            finally:
+                # Always close the shared Selenium driver
+                try:
+                    shared_driver.quit()
+                    print("\n🔒 Browser closed.")
+                except:
+                    pass
+            
+        except Exception as e:
+            error_msg = f"Error in TrendSourcesCollector: {str(e)}"
+            agent_logger.log_agent_complete(self.name, success=False, error=error_msg)
+            print(f"\n❌ {error_msg}")
+            import traceback
+            traceback.print_exc()
+            content = types.Content(role="model", parts=[types.Part(text=f"❌ {error_msg}")])
+            yield Event(author=self.name, content=content)
+
+
+# ============================================================================
 # SEQUENTIAL PIPELINE
 # ============================================================================
 
 trends_pipeline = SequentialAgent(
     name="GoogleTrendsPipeline",
-    description="Live Fetch → Categorize → Analyze → Generate Insights (with full logging)",
+    description="Live Fetch → Categorize → Analyze → Insights → Collect Sources (with full logging)",
     sub_agents=[
-        LiveTrendsFetcher(),    # Step 1: Fetch LIVE data from Google Trends
-        trend_categorizer,      # Step 2: Organize and categorize trends
-        trends_analyzer,        # Step 3: Analyze patterns
-        insights_generator,     # Step 4: Business insights
+        LiveTrendsFetcher(),      # Step 1: Fetch LIVE data from Google Trends
+        trend_categorizer,        # Step 2: Organize and categorize trends
+        trends_analyzer,          # Step 3: Analyze patterns
+        insights_generator,       # Step 4: Business insights
+        TrendSourcesCollector(),  # Step 5: Google search for news sources
     ],
 )
 
@@ -1200,22 +1605,31 @@ async def run_pipeline():
         categorized = session.state.get("categorized_trends", "")
         analysis = session.state.get("analysis_report", "")
         insights = session.state.get("strategic_insights", "")
+        trend_sources = session.state.get("trend_sources", {})
+        sources_file = session.state.get("sources_file", "")
         
         total_session_data = (
             len(json.dumps(live_data, default=str)) +
             len(str(trends_list)) +
             len(str(categorized)) +
             len(str(analysis)) +
-            len(str(insights))
+            len(str(insights)) +
+            len(json.dumps(trend_sources, default=str))
         )
         
         agent_logger.run_data["metrics"]["total_data_bytes"] += total_session_data
+        
+        # Count total URLs collected
+        total_urls = sum(data.get("url_count", 0) for data in trend_sources.values())
         
         agent_logger.log_event("session_data_summary", {
             "live_trends_data_size": len(json.dumps(live_data, default=str)),
             "trends_text_list_size": len(str(trends_list)),
             "total_unique_trends": live_data.get("summary", {}).get("total_unique_trends", 0),
             "sources_fetched": live_data.get("summary", {}).get("sources_fetched", 0),
+            "trends_searched_for_sources": len(trend_sources),
+            "total_source_urls_collected": total_urls,
+            "sources_file": sources_file,
         })
     
     # Finalize logging
